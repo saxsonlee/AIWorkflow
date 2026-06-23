@@ -286,6 +286,13 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertNotIn("## 发布包结构", readme)
         self.assertNotIn("## 安装 Codex Skill", readme)
         self.assertNotIn("解压发布包", readme)
+        self.assertIn("本文件位于 `AIWorkflow/README.md`", readme)
+        self.assertIn("YourProject/", readme)
+        self.assertIn("AIWorkflow-Repo/", readme)
+        self.assertIn("目标项目最终必须存在", readme)
+        self.assertIn(".codex/skills/aiworkflow-trigger/SKILL.md", readme)
+        self.assertNotIn("GitHub 仓库的根目录就是 AIWorkflow 的源码内容", readme)
+        self.assertNotIn("git clone <AIWorkflow 仓库地址> AIWorkflow", readme)
         self.assertIn("temp mode", readme)
         self.assertIn("contract / behavior / browser", readme)
         self.assertIn("Current.json", readme)
@@ -382,7 +389,8 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertIn("Workspace/Current.json", path_rules)
         self.assertIn("Workspace/AITDDPolicy.json", path_rules)
         self.assertIn("源码仓库只保留模板", (AIWORKFLOW_ROOT / "Core/README.md").read_text(encoding="utf-8-sig"))
-        self.assertIn("将 AIWorkflow 源码放到目标项目", setup)
+        self.assertIn("将开源仓库中的 `AIWorkflow/` 目录复制到目标项目根目录", setup)
+        self.assertIn("`.codex/` 同时复制到目标项目根目录", setup)
         self.assertIn("从 `Workspace.Template/` 创建新的 `Workspace/`", setup)
         self.assertIn("AITDDPolicy.json", setup)
         self.assertIn("policy show", runner)
@@ -802,27 +810,39 @@ class SplitLayoutTests(unittest.TestCase):
 
     def test_open_source_folder_contains_workspace_template_not_workspace(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            project_root = Path(temp_dir)
-            standalone_root = project_root / "AIWorkflow"
+            repo_root = Path(temp_dir) / "AIWorkflow.OpenSource"
+            standalone_root = repo_root / "AIWorkflow"
             shutil.copytree(AIWORKFLOW_ROOT / "Core", standalone_root / "Core")
             shutil.copytree(AIWORKFLOW_ROOT / "Workspace.Template", standalone_root / "Workspace.Template")
             shutil.copytree(AIWORKFLOW_ROOT / "Skill.Template", standalone_root / "Skill.Template")
+            shutil.copytree(
+                AIWORKFLOW_ROOT / "Skill.Template/aiworkflow-trigger",
+                repo_root / ".codex/skills/aiworkflow-trigger",
+            )
             shutil.copy2(AIWORKFLOW_ROOT / "README.md", standalone_root / "README.md")
+            (repo_root / "README.md").write_text(
+                "复制 `AIWorkflow/` 到目标项目根目录；使用 Codex 时复制 `.codex/`。\n",
+                encoding="utf-8",
+            )
 
             names = {
-                path.relative_to(project_root).as_posix()
-                for path in standalone_root.rglob("*")
+                path.relative_to(repo_root).as_posix()
+                for path in repo_root.rglob("*")
                 if path.is_file()
-                and path.relative_to(project_root).as_posix() not in {
+                and path.relative_to(repo_root).as_posix() not in {
                     "AIWorkflow/Core/OPEN_SOURCE.md",
                     "AIWorkflow/Core/README.old.md",
                 }
                 and "__pycache__" not in path.parts
                 and path.suffix != ".pyc"
             }
+            self.assertIn("README.md", names)
+            self.assertIn(".codex/skills/aiworkflow-trigger/SKILL.md", names)
             self.assertIn("AIWorkflow/README.md", names)
             self.assertIn("AIWorkflow/Core/docs/check-driver-mode.md", names)
             self.assertIn("AIWorkflow/Workspace.Template/Current.json", names)
+            self.assertNotIn("Core/docs/check-driver-mode.md", names)
+            self.assertNotIn("Skill.Template/README.md", names)
             self.assertNotIn("AIWorkflow/Workspace/Current.json", names)
             self.assertNotIn("AIWorkflow/Core/README.old.md", names)
             self.assertNotIn("AIWorkflow/Core/OPEN_SOURCE.md", names)

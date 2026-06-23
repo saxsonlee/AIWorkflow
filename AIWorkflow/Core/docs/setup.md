@@ -12,9 +12,9 @@
 
 在一个新项目中接入 AIWorkflow 时，建议按以下顺序初始化：
 
-1. 将 AIWorkflow 源码放到目标项目的 `AIWorkflow/` 目录下，源码根目录包含 `README.md`、`Core/`、`Workspace.Template/` 和 `Skill.Template/`。
+1. 将开源仓库中的 `AIWorkflow/` 目录复制到目标项目根目录。目标项目最终应存在 `AIWorkflow/README.md`、`AIWorkflow/Core/`、`AIWorkflow/Workspace.Template/` 和 `AIWorkflow/Skill.Template/`。
 2. 从 `Workspace.Template/` 创建新的 `Workspace/`，作为当前项目自己的工作区。
-3. 在 `Skill.Template/` 运行安装定位脚本找到 Codex 的 `skills` 安装位置：Windows 使用 `find_codex_skills.bat`，Linux / macOS 使用 `sh find_codex_skills.sh`。优先安装到项目 `.codex/skills/aiworkflow-trigger/`，只有多个项目共享同一套触发规则时才安装到用户 skills 目录。
+3. 如果开源仓库中带有 `.codex/`，可以把 `.codex/` 同时复制到目标项目根目录。也可以在 `Skill.Template/` 运行安装定位脚本找到 Codex 的 `skills` 安装位置：Windows 使用 `find_codex_skills.bat`，Linux / macOS 使用 `sh find_codex_skills.sh`。优先安装到项目 `.codex/skills/aiworkflow-trigger/`，只有多个项目共享同一套触发规则时才安装到用户 skills 目录。
 4. 直接运行 `validate-current`、`validate-resolution`、`validate-iteration`、`run --dry-run` 和 `run --template-smoke`，确认模板结构可用。
 5. 查看或修改 `Workspace/AITDDPolicy.json`，决定当前项目是否默认启用 AITDD。
 6. 编辑 `Workspace/Current.json`，指向项目自己的第一个 `Topic / Issue / Resolution / Iteration`。

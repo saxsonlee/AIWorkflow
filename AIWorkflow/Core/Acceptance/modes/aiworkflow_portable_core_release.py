@@ -637,6 +637,33 @@ MODE = {
         },
         {
             "id": "common.content.contains",
+            "name": "AIWorkflow README 说明自身位于子目录",
+            "severity": "required",
+            "params": {
+                "path": "README.md",
+                "text": "本文件位于 `AIWorkflow/README.md`",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "AIWorkflow README 说明 Codex 触发目录可选",
+            "severity": "required",
+            "params": {
+                "path": "README.md",
+                "text": ".codex/skills/aiworkflow-trigger/SKILL.md",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Core setup 说明复制 AIWorkflow 子目录",
+            "severity": "required",
+            "params": {
+                "path": "Core/docs/setup.md",
+                "text": "将开源仓库中的 `AIWorkflow/` 目录复制到目标项目根目录",
+            },
+        },
+        {
+            "id": "common.content.contains",
             "name": "Windows skill 安装脚本使用脚本目录",
             "severity": "required",
             "params": {
