@@ -23,6 +23,7 @@ CHECKS = {
     "common.naming.file_pascal_case": ("checks.common.naming_checks", "file_pascal_case"),
     "common.boundary.only_allowed_files_changed": ("checks.common.boundary_checks", "only_allowed_files_changed"),
     "aiworkflow.context.current_json_valid": ("checks.aiworkflow.context_checks", "current_json_valid"),
+    "aiworkflow.context.aitdd_policy_valid": ("checks.aiworkflow.context_checks", "aitdd_policy_valid"),
     "aiworkflow.record.goal_version_added": ("checks.aiworkflow.record_checks", "goal_version_added"),
     "dotnet.compile_passed": ("checks.dotnet.compile_checks", "build_passed"),
     "python.py_compile_passed": ("checks.python.compile_checks", "py_compile_passed"),

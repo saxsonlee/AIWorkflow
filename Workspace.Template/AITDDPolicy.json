@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "defaultMode": "enabled",
+  "formalRunPolicy": "explicit",
+  "templateWorkspacePolicy": "smoke-only",
+  "userOverridePhrases": {
+    "disable": [
+      "先不用 AITDD",
+      "只讨论",
+      "不需要验收"
+    ],
+    "formalRun": [
+      "正式验收",
+      "准备提交",
+      "进行 AITDD 验证"
+    ]
+  },
+  "notes": [
+    "defaultMode=enabled 表示当前项目默认启用 AITDD；AI 必须读取本文件后执行策略，而不是自行判断开关。",
+    "formalRunPolicy=explicit 表示正式 run 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段。",
+    "templateWorkspacePolicy=smoke-only 表示模板工作区只能用于安装烟测，不能作为真实任务验收入口。"
+  ]
+}

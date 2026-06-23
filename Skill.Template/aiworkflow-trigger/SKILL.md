@@ -1,6 +1,6 @@
 ---
 name: aiworkflow-trigger
-description: 当用户明确要求 AIWorkflow、AI-TDD、验收流程、Topic / Issue / Resolution / Iteration 判断、AcceptanceRunner、运行验收，或要求为当前产出定义可运行验收条件、脚本、报告、归档时使用。当前请求需要创建、切换、拆分或实质修改 AIWorkflow Issue / Resolution / Iteration 时也使用。
+description: 当目标项目安装了 AIWorkflow，且 Workspace/AITDDPolicy.json 启用或用户明确要求 AIWorkflow、AI-TDD、验收流程、Topic / Issue / Resolution / Iteration 判断、AcceptanceRunner、运行验收，或要求为当前产出定义可运行验收条件、脚本、报告、归档时使用。当前请求需要创建、切换、拆分或实质修改 AIWorkflow Issue / Resolution / Iteration 时也使用。
 ---
 
 # AIWorkflow 触发规则
@@ -9,9 +9,11 @@ description: 当用户明确要求 AIWorkflow、AI-TDD、验收流程、Topic / 
 
 ## 核心规则
 
-不要把 AIWorkflow 当作每次任务都默认执行的全局流程。
+不要让 AI 自行猜测是否启用 AIWorkflow。是否默认启用由项目内的 `Workspace/AITDDPolicy.json` 决定。
 
-只有当前请求触发本 skill 中的条件时，才使用 AIWorkflow。
+AI 必须读取本文件后执行策略；聊天上下文、任务措辞和模型偏好都不能替代该开关。
+
+如果 `Workspace/AITDDPolicy.json` 不存在，只在用户明确要求 AIWorkflow、AI-TDD、验收流程或正式验收时使用 AIWorkflow，并提示先运行 `policy init` 或从 `Workspace.Template/` 创建工作区。
 
 AIWorkflow 默认安装在目标项目的：
 
@@ -23,6 +25,7 @@ AIWorkflow/
 
 ## 应使用 AIWorkflow 的情况
 
+- `Workspace/AITDDPolicy.json` 的 `defaultMode` 是 `enabled`，且当前请求涉及实现、修复、重构、测试、验证、验收、提交或发布等真实交付。
 - 用户明确要求使用 AIWorkflow、AI-TDD、验收流程、Topic / Issue / Resolution / Iteration、AcceptanceRunner 或运行验收。
 - 当前任务需要创建、切换、拆分或实质修改 AIWorkflow Issue / Resolution / Iteration。
 - 当前任务需要判断一个请求属于当前 Issue / Resolution / Iteration，还是应该成为新的 Issue 或新的 Iteration。
@@ -31,6 +34,9 @@ AIWorkflow/
 
 ## 默认不使用 AIWorkflow 的情况
 
+- `Workspace/AITDDPolicy.json` 的 `defaultMode` 是 `off`，且用户没有临时要求使用 AIWorkflow。
+- `Workspace/AITDDPolicy.json` 的 `defaultMode` 是 `manual`，且用户没有明确要求使用 AIWorkflow、AI-TDD、验收流程或正式验收。
+- 用户明确说“先不用 AITDD”“只讨论”或“不需要验收”。
 - 普通代码修改、文件查看、概念解释、目录检查。
 - 不需要 Issue / Resolution / Iteration 判断的局部实现。
 - 不需要验收结果、报告、日志或归档的临时问答。
@@ -40,11 +46,29 @@ AIWorkflow/
 当 AIWorkflow 被触发时，先读取：
 
 ```text
+AIWorkflow/Workspace/AITDDPolicy.json
 AIWorkflow/Workspace/Current.json
 AIWorkflow/Core/README.md
 ```
 
-然后遵守 Topic / Issue / Resolution / Iteration 边界规则，再修改任何 AIWorkflow 文件。
+然后按 `AITDDPolicy.json` 决定默认行为，并遵守 Topic / Issue / Resolution / Iteration 边界规则，再修改任何 AIWorkflow 文件。
+
+策略含义：
+
+- `defaultMode: "enabled"`：当前项目默认启用 AITDD。用户不需要每次显式说明；AI 应在真实交付类任务中进入 AIWorkflow 判断链路。
+- `defaultMode: "manual"`：只有用户明确要求 AIWorkflow、AI-TDD、验收流程或正式验收时才进入 AIWorkflow。
+- `defaultMode: "off"`：默认不使用 AIWorkflow；只有用户临时要求时才进入。
+- `formalRunPolicy: "explicit"`：正式 `run` 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段。否则只运行 `validate-*` 和 `run --dry-run`。
+- `templateWorkspacePolicy: "smoke-only"`：模板工作区只能用于安装烟测，不能作为真实任务验收入口。
+
+可用以下命令查看或切换策略：
+
+```powershell
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+```
 
 `AIWorkflow/Core/README.md` 是入口页。根据任务继续读取对应 Core docs：
 

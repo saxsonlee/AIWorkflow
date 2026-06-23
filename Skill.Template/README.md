@@ -6,6 +6,8 @@
 
 这个 skill 的作用是让 Codex 识别什么时候应该进入 AIWorkflow。它不直接执行验收，验收仍由 `AIWorkflow/Core/Acceptance/acceptance_runner.py` 执行。
 
+是否默认进入 AIWorkflow 由目标项目的 `AIWorkflow/Workspace/AITDDPolicy.json` 决定，不靠 AI 自行判断。
+
 按操作系统选择安装脚本。
 
 Windows 下在当前目录运行：
@@ -79,9 +81,27 @@ python AIWorkflow\Core\Acceptance\acceptance_runner.py validate-resolution
 python AIWorkflow\Core\Acceptance\acceptance_runner.py validate-iteration
 python AIWorkflow\Core\Acceptance\acceptance_runner.py run --dry-run
 python AIWorkflow\Core\Acceptance\acceptance_runner.py run --template-smoke
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
 ```
 
 `run --template-smoke` 只用于确认模板安装可运行。真实任务验收前，应先创建或切换到正式 `Topic / Issue / Iteration`，不能直接把 `ExampleTopic / ExampleIssue` 的 Run 当作任务验收结果。
+
+## AITDD 开关
+
+`AIWorkflow/Workspace/AITDDPolicy.json` 保存项目级策略：
+
+- `defaultMode: "enabled"`：默认启用 AITDD，用户不需要每次显式说明。
+- `defaultMode: "manual"`：只有用户明确要求时才使用 AITDD。
+- `defaultMode: "off"`：默认不使用 AITDD，除非用户临时要求。
+
+用 Python 命令查看或切换：
+
+```powershell
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+```
 
 ## 使用边界
 

@@ -30,7 +30,7 @@ AIWorkflow/
 
 `Core/Acceptance` 保存 runner、registry、通用 checks、Core 内置 modes、报告生成和路径解析。
 
-`Workspace/` 保存当前工作区事实，包括 `Workspace/Current.json`、`Topic / Issue / Resolution / Iteration / Run`、`Workspace/LatestRun.md`、临时交换产物和本地缓存。
+`Workspace/` 保存当前工作区事实，包括 `Workspace/Current.json`、`Workspace/AITDDPolicy.json`、`Topic / Issue / Resolution / Iteration / Run`、`Workspace/LatestRun.md`、临时交换产物和本地缓存。
 
 `Workspace.Template/` 用于在新项目中初始化 `Workspace/`。源码仓库只保留模板；接入项目时由使用者创建自己的 `Workspace/`。
 
@@ -72,6 +72,7 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py latest
 
 - AIWorkflow 内部路径统一使用 AIWorkflow 相对路径。
 - `Workspace/Current.json` 只是当前执行指针，不作为新请求归属证明。
+- `Workspace/AITDDPolicy.json` 是项目级 AITDD 开关；AI 必须读取它，不应自行判断是否启用。
 - 没有 `acceptance` 的 Iteration 可以通过结构验证，但正式 `run` 会返回 `blocked`。
 - Check 只能验证一种事实。
 - Driver 负责流程执行和环境适配，不直接代表最终验收结论。

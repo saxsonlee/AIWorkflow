@@ -58,6 +58,33 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn("Current.json valid.", result.stdout)
 
+    def test_runner_policy_commands_manage_aitdd_switch(self):
+        show = self.run_runner("policy", "show")
+        self.assertEqual(show.returncode, 0, show.stderr + show.stdout)
+        policy = json.loads(show.stdout)
+        self.assertEqual(policy["defaultMode"], "enabled")
+        self.assertEqual(policy["formalRunPolicy"], "explicit")
+        self.assertEqual(policy["templateWorkspacePolicy"], "smoke-only")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            standalone_root = project_root / "AIWorkflow"
+            shutil.copytree(AIWORKFLOW_ROOT / "Core", standalone_root / "Core")
+            shutil.copytree(AIWORKFLOW_ROOT / "Workspace.Template", standalone_root / "Workspace")
+            runner = standalone_root / "Core/Acceptance/acceptance_runner.py"
+
+            set_result = subprocess.run(
+                [sys.executable, str(runner), "policy", "set", "--default-mode", "manual"],
+                cwd=standalone_root,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                capture_output=True,
+            )
+            self.assertEqual(set_result.returncode, 0, set_result.stderr + set_result.stdout)
+            updated = json.loads((standalone_root / "Workspace/AITDDPolicy.json").read_text(encoding="utf-8-sig"))
+            self.assertEqual(updated["defaultMode"], "manual")
+
     def test_aiworkflow_current_check_uses_workspace_default(self):
         sys.path.insert(0, str(AIWORKFLOW_ROOT / "Core/Acceptance"))
         from checks.aiworkflow.context_checks import current_json_valid
@@ -353,9 +380,14 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertIn("Workspace.Template/", architecture)
         self.assertIn("AIWorkflow 相对路径", path_rules)
         self.assertIn("Workspace/Current.json", path_rules)
+        self.assertIn("Workspace/AITDDPolicy.json", path_rules)
         self.assertIn("源码仓库只保留模板", (AIWORKFLOW_ROOT / "Core/README.md").read_text(encoding="utf-8-sig"))
         self.assertIn("将 AIWorkflow 源码放到目标项目", setup)
         self.assertIn("从 `Workspace.Template/` 创建新的 `Workspace/`", setup)
+        self.assertIn("AITDDPolicy.json", setup)
+        self.assertIn("policy show", runner)
+        self.assertIn("policy set --default-mode enabled", runner)
+        self.assertIn("validate-current` 也会验证 `Workspace/AITDDPolicy.json`", runner)
         self.assertIn("由模板创建的 `Workspace/` 默认 `source` 是 `TEMPLATE`", setup)
         self.assertIn("`Workspace/` 属于宿主项目过程资产", path_rules)
         self.assertNotIn("解压发布包", setup)
@@ -537,6 +569,7 @@ class SplitLayoutTests(unittest.TestCase):
     def test_workspace_template_exists(self):
         template_root = AIWORKFLOW_ROOT / "Workspace.Template"
         self.assertTrue((template_root / "Current.json").is_file())
+        self.assertTrue((template_root / "AITDDPolicy.json").is_file())
         self.assertTrue((template_root / "LatestRun.md").is_file())
         self.assertTrue((template_root / "ProjectContext.md").is_file())
         self.assertTrue((template_root / "README.md").is_file())
@@ -553,6 +586,12 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertIn('"topicPath": "Workspace/Topics/ExampleTopic"', current)
         self.assertIn('"source": "TEMPLATE"', current)
         self.assertNotIn("ProjectHelp/AIWorkflow/", current)
+
+        policy = json.loads((template_root / "AITDDPolicy.json").read_text(encoding="utf-8-sig"))
+        self.assertEqual(policy["defaultMode"], "enabled")
+        self.assertEqual(policy["formalRunPolicy"], "explicit")
+        self.assertEqual(policy["templateWorkspacePolicy"], "smoke-only")
+        self.assertIn("AI 必须读取本文件", "\n".join(policy["notes"]))
 
         resolution = (template_root / "Topics/ExampleTopic/Issues/ExampleIssue/Resolution/Resolution.json").read_text(encoding="utf-8-sig")
         self.assertIn('"modes": [', resolution)
@@ -596,7 +635,16 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertIn("TARGET_KIND=\"user\"", shell)
         self.assertIn("${HOME}/.codex", shell)
         self.assertIn("AIWorkflow/Core/Acceptance/acceptance_runner.py", readme)
+        self.assertIn("AITDDPolicy.json", readme)
+        self.assertIn("policy show", readme)
+        self.assertIn("policy set --default-mode enabled", readme)
         self.assertIn("AIWorkflow/Workspace/Current.json", skill)
+        self.assertIn("AIWorkflow/Workspace/AITDDPolicy.json", skill)
+        self.assertIn("defaultMode: \"enabled\"", skill)
+        self.assertIn("defaultMode: \"manual\"", skill)
+        self.assertIn("defaultMode: \"off\"", skill)
+        self.assertIn("AI 必须读取本文件后执行策略", skill)
+        self.assertIn("不要让 AI 自行猜测是否启用 AIWorkflow", skill)
         self.assertIn("Core/docs/architecture.md", skill)
         self.assertIn("Core/docs/check-driver-mode.md", skill)
         self.assertIn("Core/docs/path-rules.md", skill)
@@ -635,6 +683,8 @@ class SplitLayoutTests(unittest.TestCase):
 
         self.assertIn('"id": "aiworkflow_portable_core_release"', mode)
         self.assertIn('"id": "temp.aiworkflow_portable_core_split_iteration"', temp_mode)
+        self.assertIn("Workspace 模板 AITDDPolicy 存在", mode)
+        self.assertIn("AITDDPolicy.json", mode)
         self.assertIn("Core docs 架构文档存在", mode)
         self.assertIn("Workspace 模板标记为 TEMPLATE", mode)
         self.assertIn("Skill 导航 Core docs", mode)

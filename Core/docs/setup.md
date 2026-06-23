@@ -16,9 +16,10 @@
 2. 从 `Workspace.Template/` 创建新的 `Workspace/`，作为当前项目自己的工作区。
 3. 在 `Skill.Template/` 运行安装定位脚本找到 Codex 的 `skills` 安装位置：Windows 使用 `find_codex_skills.bat`，Linux / macOS 使用 `sh find_codex_skills.sh`。优先安装到项目 `.codex/skills/aiworkflow-trigger/`，只有多个项目共享同一套触发规则时才安装到用户 skills 目录。
 4. 直接运行 `validate-current`、`validate-resolution`、`validate-iteration`、`run --dry-run` 和 `run --template-smoke`，确认模板结构可用。
-5. 编辑 `Workspace/Current.json`，指向项目自己的第一个 `Topic / Issue / Resolution / Iteration`。
-6. 修改或替换对应的 `Issue.md`、`Decision.md`、`Resolution/Resolution.json` 和 `Resolution/Iterations/v0.1.0.md`。
-7. 如目标项目需要专用执行器、专用 checks 或 Core 外验收配方，再创建 `Adapters/` 或 `Modes/`。
+5. 查看或修改 `Workspace/AITDDPolicy.json`，决定当前项目是否默认启用 AITDD。
+6. 编辑 `Workspace/Current.json`，指向项目自己的第一个 `Topic / Issue / Resolution / Iteration`。
+7. 修改或替换对应的 `Issue.md`、`Decision.md`、`Resolution/Resolution.json` 和 `Resolution/Iterations/v0.1.0.md`。
+8. 如目标项目需要专用执行器、专用 checks 或 Core 外验收配方，再创建 `Adapters/` 或 `Modes/`。
 
 ## 最小 Current.json
 
@@ -36,6 +37,25 @@
   "updatedAt": "",
   "source": "AI_CONTEXT"
 }
+```
+
+## AITDDPolicy.json
+
+`Workspace/AITDDPolicy.json` 是项目级 AITDD 开关。AI 必须读取这个文件后执行策略，而不是自行判断是否启用。
+
+核心字段：
+
+- `defaultMode`：`enabled` 表示默认启用 AITDD，`manual` 表示仅在用户明确要求时使用，`off` 表示默认关闭。
+- `formalRunPolicy`：`explicit` 表示正式 `run` 需要用户明确要求，`auto` 表示允许按项目规则自动正式运行。
+- `templateWorkspacePolicy`：当前固定为 `smoke-only`，表示模板工作区只能用于安装烟测。
+
+查看或切换：
+
+```powershell
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy show
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode off
 ```
 
 ## 模板烟测

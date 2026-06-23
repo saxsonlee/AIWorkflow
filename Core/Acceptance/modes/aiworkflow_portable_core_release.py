@@ -150,6 +150,15 @@ MODE = {
         },
         {
             "id": "common.content.contains",
+            "name": "Core runner 支持 AITDD policy 命令",
+            "severity": "required",
+            "params": {
+                "path": "Core/docs/runner.md",
+                "text": "policy set --default-mode enabled",
+            },
+        },
+        {
+            "id": "common.content.contains",
             "name": "Core architecture 说明 Modes 顶层目录",
             "severity": "required",
             "params": {
@@ -411,6 +420,15 @@ MODE = {
         },
         {
             "id": "common.content.contains",
+            "name": "Skill 使用 AITDDPolicy 作为开关",
+            "severity": "required",
+            "params": {
+                "path": "Skill.Template/aiworkflow-trigger/SKILL.md",
+                "text": "不要让 AI 自行猜测是否启用 AIWorkflow",
+            },
+        },
+        {
+            "id": "common.content.contains",
             "name": "Skill 约束 check 单一事实",
             "severity": "required",
             "params": {
@@ -486,6 +504,22 @@ MODE = {
             "name": "Workspace 模板 Current 存在",
             "severity": "required",
             "params": {"path": "Workspace.Template/Current.json"},
+        },
+        {
+            "id": "common.file.exists",
+            "name": "Workspace 模板 AITDDPolicy 存在",
+            "severity": "required",
+            "params": {"path": "Workspace.Template/AITDDPolicy.json"},
+        },
+        {
+            "id": "common.json.field_matches",
+            "name": "Workspace 模板默认启用 AITDD",
+            "severity": "required",
+            "params": {
+                "path": "Workspace.Template/AITDDPolicy.json",
+                "field": "defaultMode",
+                "pattern": "^enabled$",
+            },
         },
         {
             "id": "common.file.exists",

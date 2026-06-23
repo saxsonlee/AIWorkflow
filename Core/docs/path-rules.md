@@ -15,6 +15,7 @@ AIWorkflow 内部路径统一使用 AIWorkflow 相对路径：
 ```text
 Core/Acceptance/acceptance_runner.py
 Workspace/Current.json
+Workspace/AITDDPolicy.json
 Workspace/Topics/<Topic>/Issues/<Issue>/Resolution/Resolution.json
 Workspace.Template/Current.json
 Adapters/checks/
@@ -47,6 +48,16 @@ Workspace/Current.json
   "iterationPath": "Workspace/Topics/<Topic>/Issues/<Issue>/Resolution/Iterations/v0.1.0.md"
 }
 ```
+
+## Policy 路径
+
+AITDD 开关固定为：
+
+```text
+Workspace/AITDDPolicy.json
+```
+
+Skill、runner 和文档都应引用该路径，不应把开关写入聊天提示或宿主项目绝对路径。
 
 ## Run 路径
 

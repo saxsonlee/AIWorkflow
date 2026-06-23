@@ -20,6 +20,7 @@ CURRENT_PATH = Path("Workspace/Current.json")
 sys.path.insert(0, str(ACCEPTANCE_ROOT))
 
 import acceptance_registry
+import aitdd_policy
 import path_resolver
 import report_writer
 
@@ -68,6 +69,14 @@ def main():
     subparsers.add_parser("list-modes")
     subparsers.add_parser("list-checks")
     subparsers.add_parser("latest")
+    policy_parser = subparsers.add_parser("policy")
+    policy_subparsers = policy_parser.add_subparsers(dest="policy_command", required=True)
+    policy_subparsers.add_parser("show")
+    policy_set_parser = policy_subparsers.add_parser("set")
+    policy_set_parser.add_argument("--default-mode", choices=sorted(aitdd_policy.DEFAULT_MODES))
+    policy_set_parser.add_argument("--formal-run-policy", choices=sorted(aitdd_policy.FORMAL_RUN_POLICIES))
+    policy_set_parser.add_argument("--template-workspace-policy", choices=sorted(aitdd_policy.TEMPLATE_WORKSPACE_POLICIES))
+    policy_subparsers.add_parser("init")
 
     args = parser.parse_args()
 
@@ -104,6 +113,8 @@ def main():
                 return EXIT_CODES["blocked"]
             print(latest_path.read_text(encoding="utf-8-sig"))
             return 0
+        if args.command == "policy":
+            return policy_command(args)
     except Exception as ex:
         print(f"runner error: {ex}", file=sys.stderr)
         return EXIT_CODES["error"]
@@ -242,7 +253,30 @@ def validate_current():
             raise FileNotFoundError(f"{key}: {data[key]}")
     if not data["currentIteration"]:
         raise ValueError("Current.json currentIteration is empty.")
+    aitdd_policy.load_policy(AIWORKFLOW_ROOT)
     return data
+
+
+def policy_command(args):
+    if args.policy_command == "show":
+        policy = aitdd_policy.load_policy(AIWORKFLOW_ROOT)
+        print(json.dumps(policy, ensure_ascii=False, indent=2))
+        return 0
+    if args.policy_command == "init":
+        path = aitdd_policy.create_default_policy(AIWORKFLOW_ROOT)
+        print(f"{path_resolver.to_aiworkflow_relative(path.relative_to(AIWORKFLOW_ROOT).as_posix())} ready.")
+        return 0
+    if args.policy_command == "set":
+        if not any([args.default_mode, args.formal_run_policy, args.template_workspace_policy]):
+            raise ValueError("policy set requires at least one option.")
+        policy = aitdd_policy.update_policy(
+            AIWORKFLOW_ROOT,
+            default_mode=args.default_mode,
+            formal_run_policy=args.formal_run_policy,
+            template_workspace_policy=args.template_workspace_policy,
+        )
+        print(json.dumps(policy, ensure_ascii=False, indent=2))
+        return 0
 
 
 def validate_resolution(resolution_path):

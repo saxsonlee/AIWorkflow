@@ -6,15 +6,17 @@
 
 1. 将 `Workspace.Template/` 复制为 `Workspace/`。
 2. 按项目实际情况修改 `Workspace/Current.json`。
-3. 修改或替换 `Workspace/Topics/ExampleTopic/Issues/ExampleIssue/` 下的示例 Issue。
-4. 运行：
+3. 按团队习惯修改 `Workspace/AITDDPolicy.json`。
+4. 修改或替换 `Workspace/Topics/ExampleTopic/Issues/ExampleIssue/` 下的示例 Issue。
+5. 运行：
 
 ```powershell
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-current
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-resolution
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-iteration
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy show
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --dry-run
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --template-smoke
 ```
 
 ## 默认示例
@@ -22,6 +24,23 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run
 模板内置 `ExampleTopic / ExampleIssue / v0.1.0`，在 `acceptance.modes` 中使用 Core 内置的 `aiworkflow_minimal` mode。
 
 这个 mode 只检查 AIWorkflow 自身的最小结构，不依赖宿主项目文件、Adapter、外部命令或私有路径。
+
+## AITDD 开关
+
+`AITDDPolicy.json` 是当前项目的 AITDD 策略开关。AI 应读取这个文件，而不是自行判断是否启用 AITDD。
+
+- `defaultMode: "enabled"`：默认启用 AITDD，用户不需要每次显式说明。
+- `defaultMode: "manual"`：只有用户明确要求时才使用 AITDD。
+- `defaultMode: "off"`：默认不使用 AITDD，除非用户临时要求。
+
+可以用 runner 查看或切换：
+
+```powershell
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy show
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+```
 
 ## 目录说明
 
@@ -32,5 +51,7 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run
 `Local/` 保存本地机器配置，不应记录密钥、账号或不可公开路径。
 
 `ProjectContext.md` 用于记录宿主项目上下文。
+
+`AITDDPolicy.json` 用于记录是否默认启用 AITDD、正式 run 是否需要显式确认、模板工作区是否只能用于 smoke。
 
 `LatestRun.md` 会在正式 run 后被 runner 更新为最近一次验收入口。

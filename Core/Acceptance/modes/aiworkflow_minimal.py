@@ -9,6 +9,12 @@ MODE = {
             "params": {},
         },
         {
+            "id": "aiworkflow.context.aitdd_policy_valid",
+            "name": "AITDDPolicy.json 有效",
+            "severity": "required",
+            "params": {},
+        },
+        {
             "id": "common.json.field_matches",
             "name": "Resolution 指向当前 Issue",
             "severity": "required",

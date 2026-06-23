@@ -34,6 +34,21 @@ cp -R AIWorkflow/Workspace.Template AIWorkflow/Workspace
 
 如果目标项目已经有自己的 `AIWorkflow/Workspace/`，不要覆盖它。`Workspace/` 保存当前项目的 `Topic / Issue / Resolution / Iteration / Run`，属于项目过程资产。
 
+`Workspace/AITDDPolicy.json` 保存当前项目的 AITDD 开关。AI 不应凭感觉决定是否启用 AITDD，而应先读取这个文件：
+
+- `defaultMode: "enabled"`：默认启用 AITDD，用户不需要每次显式说明。
+- `defaultMode: "manual"`：只有用户明确要求时才使用 AITDD。
+- `defaultMode: "off"`：默认不使用 AITDD，除非用户临时要求。
+
+可以用 Python 命令查看或切换：
+
+```powershell
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+```
+
 ### 安装 AI 触发规则
 
 当前版本提供 Codex 触发规则模板，用来让 AI 知道什么时候进入 AIWorkflow。以后如果支持其他 IDE 或 AI 助手，也应接入同一套 `Topic / Issue / Resolution / Iteration / Run` 流程。
@@ -68,6 +83,8 @@ python AIWorkflow\Core\Acceptance\acceptance_runner.py latest
 ```
 
 `run --template-smoke` 只证明安装可运行。真实任务验收前，应先创建或切换到正式 `Topic / Issue / Iteration`。
+
+安装后如果 `Workspace/AITDDPolicy.json` 的 `defaultMode` 是 `enabled`，AI 应按项目策略主动进入 AITDD 流程；用户只需要在不希望使用 AITDD、只想讨论，或需要正式 `run` 时明确说明。
 
 ## 开始真实任务
 
