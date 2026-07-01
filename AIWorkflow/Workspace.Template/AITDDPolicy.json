@@ -18,6 +18,7 @@
   "notes": [
     "defaultMode=enabled 表示当前项目默认启用 AITDD；AI 必须读取本文件后执行策略，而不是自行判断开关。",
     "formalRunPolicy=explicit 表示正式 run 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段。",
+    "formalRunPolicy=auto 表示允许 AI 在项目规则、当前 Iteration 和验收配置都明确时自动发起正式 run；模板工作区仍只能运行安装烟测。",
     "templateWorkspacePolicy=smoke-only 表示模板工作区只能用于安装烟测，不能作为真实任务验收入口。"
   ]
 }

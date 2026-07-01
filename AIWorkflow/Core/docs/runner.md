@@ -26,6 +26,8 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy show
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy explicit
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy auto
 ```
 
 ## 验证命令
@@ -64,7 +66,10 @@ Runner 会读取可选的 `acceptance.semanticHints`。如果某个 semantic hin
 - `manual`：只有用户明确要求时才使用 AITDD。
 - `off`：默认不使用 AITDD，除非用户临时要求。
 
-`policy set --formal-run-policy explicit|auto` 切换正式 `run` 是否需要显式确认。
+`policy set --formal-run-policy explicit|auto` 切换正式 `run` 是否需要显式确认：
+
+- `explicit`：正式 `run` 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段。否则只运行 `validate-*` 和 `run --dry-run`。
+- `auto`：允许 AI 在项目规则、当前 Iteration 和验收配置都明确时自动发起正式 `run`。仍必须遵守 `templateWorkspacePolicy`，模板工作区只能运行安装烟测。
 
 `policy set --template-workspace-policy smoke-only` 保持模板工作区只能用于安装烟测。
 

@@ -73,6 +73,8 @@ cp -R AIWorkflow/Workspace.Template AIWorkflow/Workspace
 - `defaultMode: "enabled"`：默认启用 AITDD，用户不需要每次显式说明。
 - `defaultMode: "manual"`：只有用户明确要求时才使用 AITDD。
 - `defaultMode: "off"`：默认不使用 AITDD，除非用户临时要求。
+- `formalRunPolicy: "explicit"`：正式 `run` 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段。否则只运行 `validate-*` 和 `run --dry-run`。
+- `formalRunPolicy: "auto"`：允许 AI 在项目规则、当前 Iteration 和验收配置都明确时自动发起正式 `run`。模板工作区仍只能运行安装烟测。
 
 可以用 Python 命令查看或切换：
 
@@ -81,6 +83,8 @@ python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy explicit
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy auto
 ```
 
 ### 安装 AI 触发规则

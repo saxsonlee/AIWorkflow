@@ -59,6 +59,7 @@ AIWorkflow/Core/README.md
 - `defaultMode: "manual"`：只有用户明确要求 AIWorkflow、AI-TDD、验收流程或正式验收时才进入 AIWorkflow。
 - `defaultMode: "off"`：默认不使用 AIWorkflow；只有用户临时要求时才进入。
 - `formalRunPolicy: "explicit"`：正式 `run` 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段。否则只运行 `validate-*` 和 `run --dry-run`。
+- `formalRunPolicy: "auto"`：允许 AI 在项目规则、当前 Iteration 和验收配置都明确时自动发起正式 `run`。仍必须遵守 `templateWorkspacePolicy`，模板工作区只能运行安装烟测。
 - `templateWorkspacePolicy: "smoke-only"`：模板工作区只能用于安装烟测，不能作为真实任务验收入口。
 
 可用以下命令查看或切换策略：
@@ -68,6 +69,8 @@ python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy explicit
+python AIWorkflow\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy auto
 ```
 
 `AIWorkflow/Core/README.md` 是入口页。根据任务继续读取对应 Core docs：

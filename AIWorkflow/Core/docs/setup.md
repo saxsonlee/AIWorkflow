@@ -46,7 +46,7 @@
 核心字段：
 
 - `defaultMode`：`enabled` 表示默认启用 AITDD，`manual` 表示仅在用户明确要求时使用，`off` 表示默认关闭。
-- `formalRunPolicy`：`explicit` 表示正式 `run` 需要用户明确要求，`auto` 表示允许按项目规则自动正式运行。
+- `formalRunPolicy`：`explicit` 表示正式 `run` 需要用户明确要求，或当前任务已经进入明确的提交/正式验收阶段；`auto` 表示允许 AI 在项目规则、当前 Iteration 和验收配置都明确时自动发起正式 `run`。
 - `templateWorkspacePolicy`：当前固定为 `smoke-only`，表示模板工作区只能用于安装烟测。
 
 查看或切换：
@@ -56,6 +56,8 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy show
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode enabled
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode manual
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --default-mode off
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy explicit
+python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --formal-run-policy auto
 ```
 
 ## 模板烟测
