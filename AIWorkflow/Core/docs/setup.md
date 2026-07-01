@@ -10,34 +10,21 @@
 
 ## 新项目初始化
 
-在一个新项目中接入 AIWorkflow 时，建议按以下顺序初始化：
+在一个新项目中接入 AIWorkflow 时，普通用户只需要完成最小安装：
 
 1. 将开源仓库中的 `AIWorkflow/` 目录复制到目标项目根目录。目标项目最终应存在 `AIWorkflow/README.md`、`AIWorkflow/Core/`、`AIWorkflow/Workspace.Template/` 和 `AIWorkflow/Skill.Template/`。
 2. 从 `Workspace.Template/` 创建新的 `Workspace/`，作为当前项目自己的工作区。
-3. 如果开源仓库中带有 `.codex/`，可以把 `.codex/` 同时复制到目标项目根目录。也可以在 `Skill.Template/` 运行安装定位脚本找到 Codex 的 `skills` 安装位置：Windows 使用 `find_codex_skills.bat`，Linux / macOS 使用 `sh find_codex_skills.sh`。优先安装到项目 `.codex/skills/aiworkflow-trigger/`，只有多个项目共享同一套触发规则时才安装到用户 skills 目录。
-4. 直接运行 `validate-current`、`validate-resolution`、`validate-iteration`、`run --dry-run` 和 `run --template-smoke`，确认模板结构可用。
-5. 查看或修改 `Workspace/AITDDPolicy.json`，决定当前项目是否默认启用 AITDD。
-6. 编辑 `Workspace/Current.json`，指向项目自己的第一个 `Topic / Issue / Resolution / Iteration`。
-7. 修改或替换对应的 `Issue.md`、`Decision.md`、`Resolution/Resolution.json` 和 `Resolution/Iterations/v0.1.0.md`。
-8. 如目标项目需要专用执行器、专用 checks 或 Core 外验收配方，再创建 `Adapters/` 或 `Modes/`。
+3. 开源仓库包含 `.codex/` 触发规则。使用 Codex 时，建议把 `.codex/` 一起复制到目标项目根目录。也可以在 `Skill.Template/` 运行安装定位脚本找到 Codex 的 `skills` 安装位置：Windows 使用 `find_codex_skills.bat`，Linux / macOS 使用 `sh find_codex_skills.sh`。优先安装到项目 `.codex/skills/aiworkflow-trigger/`，只有多个项目共享同一套触发规则时才安装到用户 skills 目录。
 
-## 最小 Current.json
+完成后即可向 AI 描述真实任务。AI 会读取 `Workspace/AITDDPolicy.json`，按策略创建或切换正式 Topic / Issue / Iteration，并在需要验收时执行对应 runner 命令。
 
-```json
-{
-  "schemaVersion": "1.0",
-  "topic": "ExampleTopic",
-  "topicPath": "Workspace/Topics/ExampleTopic",
-  "issue": "ExampleIssue",
-  "issuePath": "Workspace/Topics/ExampleTopic/Issues/ExampleIssue/Issue.md",
-  "decisionPath": "Workspace/Topics/ExampleTopic/Issues/ExampleIssue/Decision.md",
-  "resolutionPath": "Workspace/Topics/ExampleTopic/Issues/ExampleIssue/Resolution/Resolution.json",
-  "currentIteration": "v0.1.0",
-  "iterationPath": "Workspace/Topics/ExampleTopic/Issues/ExampleIssue/Resolution/Iterations/v0.1.0.md",
-  "updatedAt": "",
-  "source": "AI_CONTEXT"
-}
-```
+可选维护项：
+
+- 需要调整默认启用策略时，修改 `Workspace/AITDDPolicy.json`。
+- 目标项目需要专用执行器、专用 checks 或 Core 外验收配方时，再创建 `Adapters/` 或 `Modes/`。
+- 需要排查安装、CI 接入或维护脚本时，再手动运行 `validate-*`、`run --dry-run`、`run --template-smoke`、`list-checks` 或 `list-modes`。
+
+需要手动维护工作区结构时，查看 `Core/docs/data-model.md`。
 
 ## AITDDPolicy.json
 
@@ -76,9 +63,9 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --form
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --template-smoke
 ```
 
-## 迁移后检查
+## 手动检查
 
-迁移后优先检查：
+普通用户通常不需要手动运行这些命令。排查安装、CI 接入或维护脚本需要时，可从宿主项目根目录运行：
 
 ```powershell
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-current

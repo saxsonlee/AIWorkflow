@@ -5,21 +5,10 @@
 ## 使用方式
 
 1. 将 `Workspace.Template/` 复制为 `Workspace/`。
-2. 按项目实际情况修改 `Workspace/Current.json`。
-3. 按团队习惯修改 `Workspace/AITDDPolicy.json`。
-4. 修改或替换 `Workspace/Topics/ExampleTopic/Issues/ExampleIssue/` 下的示例 Issue。
-5. 运行：
+2. 按团队习惯修改 `Workspace/AITDDPolicy.json`。
+3. 开始向 AI 描述真实任务。AI 应根据任务内容创建或切换正式 Topic / Issue / Iteration。
 
-```powershell
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-current
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-resolution
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-iteration
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy show
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --dry-run
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --template-smoke
-```
-
-`run --dry-run` 用于预览当前 Iteration 解析出的验收配置、证据要求和 checks，不生成 `Runs/` 目录，不更新 `LatestRun.md`，也不形成正式 pass/fail 记录。
+模板内置的 `ExampleTopic / ExampleIssue` 只用于安装烟测，不要当作真实验收入口。需要手动排查安装时，可参考 `Core/docs/runner.md` 运行 `validate-*`、`run --dry-run` 或 `run --template-smoke`。
 
 ## 默认示例
 

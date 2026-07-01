@@ -28,7 +28,7 @@ YourProject/
     Skill.Template/
 ```
 
-如果你是从开源仓库接入，复制仓库中的 `AIWorkflow/` 目录到目标项目根目录。若使用 Codex，也可以同时复制仓库中的 `.codex/` 目录：
+如果你是从开源仓库接入，复制仓库中的 `AIWorkflow/` 目录到目标项目根目录。开源仓库同时包含 `.codex/` 触发规则；使用 Codex 时，建议把 `.codex/` 一起复制到目标项目根目录：
 
 ```text
 AIWorkflow-Repo/
@@ -42,13 +42,13 @@ AIWorkflow-Repo/
 AIWorkflow/Core/Acceptance/acceptance_runner.py
 ```
 
-如果使用 Codex，建议同时存在：
+使用 Codex 时，建议同时存在：
 
 ```text
 .codex/skills/aiworkflow-trigger/SKILL.md
 ```
 
-`.codex/` 是可选项，只用于让支持 Codex skill 的环境自动识别 AIWorkflow。即使不复制 `.codex/`，也可以手动运行 `AIWorkflow/Core/Acceptance/acceptance_runner.py`。
+`.codex/` 只用于让支持 Codex skill 的环境自动识别 AIWorkflow。不使用 Codex 时可以忽略它，也可以手动运行 `AIWorkflow/Core/Acceptance/acceptance_runner.py`。
 
 保持目录名为 `AIWorkflow`。Core 内部路径都以 `AIWorkflow/` 为起点，不依赖当前项目名称。
 
@@ -107,38 +107,37 @@ sh AIWorkflow/Skill.Template/find_codex_skills.sh
 
 安装细节见 `Skill.Template/README.md`。
 
-### 安装后自检
+### 安装后使用
 
-在目标项目根目录执行：
+复制出 `Workspace/` 并安装触发规则后，普通使用不需要手动记 runner 命令。直接向 AI 描述任务即可；AI 会读取 `Workspace/AITDDPolicy.json`，按项目策略判断是否进入 AIWorkflow、是否需要创建或切换正式 `Topic / Issue / Iteration`，并在需要验收时展示执行结果。
 
-```powershell
-python AIWorkflow\Core\Acceptance\acceptance_runner.py validate-current
-python AIWorkflow\Core\Acceptance\acceptance_runner.py validate-resolution
-python AIWorkflow\Core\Acceptance\acceptance_runner.py validate-iteration
-python AIWorkflow\Core\Acceptance\acceptance_runner.py run --dry-run
-python AIWorkflow\Core\Acceptance\acceptance_runner.py run --template-smoke
-python AIWorkflow\Core\Acceptance\acceptance_runner.py latest
-```
-
-`run --template-smoke` 只证明安装可运行。真实任务验收前，应先创建或切换到正式 `Topic / Issue / Iteration`。
-
-`run --dry-run` 用于预览当前 Iteration 解析出的验收配置、证据要求和 checks，不生成 `Runs/` 目录，不更新 `LatestRun.md`，也不形成正式 pass/fail 记录。
-
-安装后如果 `Workspace/AITDDPolicy.json` 的 `defaultMode` 是 `enabled`，AI 应按项目策略主动进入 AITDD 流程；用户只需要在不希望使用 AITDD、只想讨论，或需要正式 `run` 时明确说明。
+`run --template-smoke` 只是模板安装烟测，通常只在排查安装问题时使用。runner 命令说明见 `Core/docs/runner.md`。
 
 ## 开始真实任务
 
-模板烟测通过后，不要直接把 `ExampleTopic / ExampleIssue` 当作真实任务。
+模板内置的 `ExampleTopic / ExampleIssue` 只是安装示例，不要当作真实任务。
 
-真实任务建议按这个顺序开始：
+正常使用时，复制出 `Workspace/` 后就可以开始向 AI 描述任务。AI 会根据 `Workspace/AITDDPolicy.json` 和当前请求判断是否需要创建或切换正式 `Topic / Issue / Iteration`，并在需要验收时运行 `validate-*` 和 `run --dry-run`。
 
-1. 创建或切换到正式 `Topic / Issue / Iteration`。
-2. 修改 `Workspace/Current.json`，让它指向当前任务。
-3. 在当前 `Resolution.json` 中声明本次验收入口。
-4. 根据任务需要选择已有 mode，或在项目侧创建新的 check、driver、mode。
-5. 运行 `validate-*`、`run --dry-run` 和正式 `run`。
+常用说法：
 
-详细初始化步骤见 `Core/docs/setup.md`。
+```text
+请按 AIWorkflow 为这个任务创建或切换到合适的 Topic / Issue / Iteration，并先只运行 validate-* 和 run --dry-run。
+```
+
+需要生成正式验收记录时，再明确说：
+
+```text
+请执行正式 AIWorkflow run，并把 Report / Result 路径告诉我。
+```
+
+如果只是想讨论方案，可以说：
+
+```text
+先不用 AITDD，只讨论方案。
+```
+
+详细初始化步骤见 `Core/docs/setup.md`。数据结构和扩展规则见 `Core/docs/data-model.md`、`Core/docs/check-driver-mode.md` 和 `Core/docs/extension-boundary.md`。
 
 ## 文档
 

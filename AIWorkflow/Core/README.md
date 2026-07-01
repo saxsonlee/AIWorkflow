@@ -52,21 +52,11 @@ AIWorkflow/
 - Core / Adapters / Modes 扩展边界：`Core/docs/extension-boundary.md`
 - 新项目初始化和迁移检查：`Core/docs/setup.md`
 
-## 使用入口
+## 使用方式
 
-从宿主项目根目录执行：
+普通使用不需要记 runner 命令。接入项目复制出 `Workspace/` 并安装触发规则后，直接向 AI 描述任务即可；AI 会按 `Workspace/AITDDPolicy.json` 判断是否进入 AIWorkflow，并在对话中展示验收结果。
 
-```powershell
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-current
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-resolution
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py validate-iteration
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --dry-run
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --template-smoke
-python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py latest
-```
-
-`run --template-smoke` 只用于模板安装烟测。真实任务验收前，必须先创建或切换到正式 `Topic / Issue / Iteration`，并在当前 Iteration 中声明验收条件。
+Runner 命令主要用于手动排查、CI 或维护脚本，详见 `Core/docs/runner.md`。
 
 ## 核心约束
 
