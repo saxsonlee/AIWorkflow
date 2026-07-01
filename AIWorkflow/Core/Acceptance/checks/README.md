@@ -114,6 +114,14 @@ Core 只识别通用证据类型：
 
 正式 `run` 必须验证 `requiredEvidence` 中每一种证据类型都有至少一个对应 check。`behavior` 和 `browser` 类型的 check 必须引用 driver、driver 产物或显式 driver evidence；不能只用静态 contract check 代替。
 
+Iteration 可以通过 `acceptance.semanticHints` 声明技术中立语义意图。`semanticHints` 不替代 `requiredEvidence`；如果声明了 `browser`、`behavior` 或 `contract` hint，当前 Iteration 也必须在 `requiredEvidence` 中声明同一证据类型。
+
+`browser` 证据可以由浏览器、桌面 UI 或端到端交互 driver 产出，产物可以是截图、trace、DOM 或 accessibility tree dump、窗口元数据、交互日志、网络日志或 driver result JSON。Core 不强制某一种产物形态；被 check 用作验收依据的产物应通过 check 的 `artifacts` 归档到 Run 目录。
+
+视频属于最低等级的 UI 辅助能力，只作为人工复核材料。可以由 driver 录制并通过 `artifacts` 归档，但不要进入机器验收流程；不要用“视频文件存在”或视频内容分析来覆盖 `browser` evidence。
+
+当用户要求“视频证据”“录屏验收”或类似能力时，默认实现必须是录制视频作为 `human-review-video` artifact，并明确说明视频不参与机器验收或 pass/fail 判定。即使视频 artifact 被错误标记为 evidence，也不应计入 `requiredEvidence` 覆盖。
+
 ## Mode 职责规则
 
 Mode 是验收配方，负责组合多个原子 check，并声明这些 check 的参数、名称和 required / optional 严重级别。

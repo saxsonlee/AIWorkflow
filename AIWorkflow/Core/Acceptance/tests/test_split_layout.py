@@ -26,10 +26,13 @@ class SplitLayoutTests(unittest.TestCase):
         )
 
     def load_runner_module(self):
-        spec = importlib.util.spec_from_file_location("acceptance_runner_for_test", RUNNER)
+        runner = RUNNER
+        if not runner.exists():
+            runner = Path(__file__).resolve().parents[3] / "Core/Acceptance/acceptance_runner.py"
+        spec = importlib.util.spec_from_file_location("acceptance_runner_for_test", runner)
         module = importlib.util.module_from_spec(spec)
         original_path = list(sys.path)
-        sys.path.insert(0, str(RUNNER.parent))
+        sys.path.insert(0, str(runner.parent))
         try:
             spec.loader.exec_module(module)
         finally:
@@ -167,6 +170,130 @@ class SplitLayoutTests(unittest.TestCase):
             findings,
         )
 
+    def test_semantic_hints_gate_blocks_missing_required_evidence(self):
+        module = self.load_runner_module()
+
+        findings = module._audit_semantic_hints(["browser"], ["contract"])
+
+        self.assertTrue(
+            any(item["id"] == "aiworkflow.acceptance.semantic_hint_evidence" for item in findings),
+            findings,
+        )
+        self.assertEqual(findings[0]["acceptanceType"], "browser")
+
+    def test_semantic_hints_gate_accepts_matching_required_evidence(self):
+        module = self.load_runner_module()
+
+        findings = module._audit_semantic_hints(["browser"], ["contract", "browser"])
+
+        self.assertEqual(findings, [])
+
+    def test_acceptance_validates_semantic_hints(self):
+        module = self.load_runner_module()
+
+        module._validate_acceptance(
+            {
+                "modes": ["aiworkflow_minimal"],
+                "requiredEvidence": ["contract", "browser"],
+                "semanticHints": ["browser"],
+                "extraChecks": [],
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "Unknown semantic hint"):
+            module._validate_acceptance(
+                {
+                    "modes": ["aiworkflow_minimal"],
+                    "semanticHints": ["desktop-gui"],
+                    "extraChecks": [],
+                }
+            )
+
+    def test_required_evidence_gate_does_not_accept_video_artifact_by_default(self):
+        module = self.load_runner_module()
+        checks = [
+            {
+                "id": "common.file.exists",
+                "name": "UI driver video artifact exists as auxiliary material",
+                "severity": "required",
+                "acceptanceType": "browser",
+                "params": {
+                    "path": "Workspace/Temp/UiDriver/ui-flow.webm",
+                },
+                "artifacts": [
+                    {
+                        "type": "human-review-video",
+                        "source": "Workspace/Temp/UiDriver/ui-flow.webm",
+                        "targetName": "ui-flow.webm",
+                    }
+                ],
+            }
+        ]
+
+        findings = module._audit_required_evidence(checks, ["browser"])
+
+        self.assertTrue(
+            any(item["id"] == "aiworkflow.acceptance.required_evidence" for item in findings),
+            findings,
+        )
+
+    def test_required_evidence_gate_rejects_video_even_when_labeled(self):
+        module = self.load_runner_module()
+        checks = [
+            {
+                "id": "common.file.exists",
+                "name": "UI driver video artifact exists for human review",
+                "severity": "required",
+                "acceptanceType": "browser",
+                "evidence": "browser-video",
+                "params": {
+                    "path": "Workspace/Temp/UiDriver/ui-flow.webm",
+                },
+                "artifacts": [
+                    {
+                        "type": "human-review-video",
+                        "source": "Workspace/Temp/UiDriver/ui-flow.webm",
+                        "targetName": "ui-flow.webm",
+                    }
+                ],
+            }
+        ]
+
+        findings = module._audit_required_evidence(checks, ["browser"])
+
+        self.assertTrue(
+            any(item["id"] == "aiworkflow.acceptance.required_evidence" for item in findings),
+            findings,
+        )
+
+    def test_required_evidence_gate_ignores_video_artifact_evidence_flag(self):
+        module = self.load_runner_module()
+        checks = [
+            {
+                "id": "common.file.exists",
+                "name": "UI driver video artifact exists for human review",
+                "severity": "required",
+                "acceptanceType": "browser",
+                "params": {
+                    "path": "Workspace/Temp/UiDriver/ui-flow.webm",
+                },
+                "artifacts": [
+                    {
+                        "type": "human-review-video",
+                        "source": "Workspace/Temp/UiDriver/ui-flow.webm",
+                        "targetName": "ui-flow.webm",
+                        "evidence": True,
+                    }
+                ],
+            }
+        ]
+
+        findings = module._audit_required_evidence(checks, ["browser"])
+
+        self.assertTrue(
+            any(item["id"] == "aiworkflow.acceptance.required_evidence" for item in findings),
+            findings,
+        )
+
     def test_core_required_evidence_gate_is_not_keyword_based(self):
         module = self.load_runner_module()
         runner = (AIWORKFLOW_ROOT / "Core/Acceptance/acceptance_runner.py").read_text(encoding="utf-8-sig")
@@ -181,6 +308,8 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertNotIn("A 做操作 B", runner + check_driver_mode + skill)
         self.assertNotIn("新名字", runner + check_driver_mode + skill)
         self.assertNotIn("跨客户端或跨会话", runner + check_driver_mode + skill)
+        self.assertNotIn("gui_app.py", runner + check_driver_mode + skill)
+        self.assertNotIn("*.tsx", runner + check_driver_mode + skill)
 
     def test_registry_discovers_core_and_adapter_modes(self):
         result = self.run_runner("list-modes")
@@ -384,6 +513,8 @@ class SplitLayoutTests(unittest.TestCase):
         setup = docs["setup"].read_text(encoding="utf-8-sig")
 
         self.assertIn("Core/Acceptance", architecture)
+        self.assertIn("Core/Acceptance/tests` 保存源库开发自检和发布门禁测试", architecture)
+        self.assertIn("不属于宿主项目接入 AIWorkflow 后的核心运行能力", architecture)
         self.assertIn("Workspace.Template/", architecture)
         self.assertIn("AIWorkflow 相对路径", path_rules)
         self.assertIn("Workspace/Current.json", path_rules)
@@ -751,7 +882,7 @@ class SplitLayoutTests(unittest.TestCase):
         self.assertIn("python.unittest_passed", registry)
         self.assertIn("def unittest_passed", checks)
         self.assertIn('"id": "python.unittest_passed"', mode)
-        self.assertIn("Core Acceptance unittest 通过", mode)
+        self.assertIn("源库自检 unittest 通过", mode)
 
     def test_core_and_workspace_template_are_minimally_runnable_standalone(self):
         with tempfile.TemporaryDirectory() as temp_dir:

@@ -94,7 +94,15 @@ Iteration 的 `acceptance.requiredEvidence` 用于声明本次验收必须覆盖
 
 正式 `run` 必须验证 `requiredEvidence` 中每一种证据类型都有至少一个对应 check。`behavior` 和 `browser` 类型的 check 必须引用 driver、driver 产物或显式 driver evidence；不能只用静态 contract check 代替。
 
-Core runner 不根据自然语言关键词判断某个需求是否应该需要 `behavior` 或 `browser`。这个判断应在 Iteration acceptance、mode 或宿主项目规则中完成，并通过 `requiredEvidence` 显式声明。
+Core runner 不根据自然语言关键词、文件名、技术栈或宿主项目目录判断某个需求是否应该需要 `behavior` 或 `browser`。这个判断应在 Iteration acceptance、mode、Adapter 或宿主项目规则中完成，并通过 `requiredEvidence` 显式声明。
+
+当宿主项目、Adapter、mode 或当前 Iteration 已经知道本次验收涉及某类语义意图时，可以在 `acceptance.semanticHints` 中声明 `contract`、`behavior` 或 `browser`。`semanticHints` 不替代 `requiredEvidence`；它是技术中立的前置门禁输入。正式 `run` 会阻塞“声明了某个 semantic hint，但没有把同一类型写入 `requiredEvidence`”的验收配置。
+
+`browser` 证据不强制等同于截图。它可以是截图、trace、DOM 或 accessibility tree dump、窗口元数据、交互日志、网络日志、driver result JSON 等机器可读或可归档产物。被 check 用作验收依据的产物应通过 check 的 `artifacts` 声明进入 Run 目录。
+
+视频属于最低等级的 UI 辅助能力，只作为人工复核材料。可以由 driver 录制并通过 `artifacts` 归档，但不要进入机器验收流程；不要用“视频文件存在”或视频内容分析来覆盖 `browser` evidence。
+
+当用户要求“视频证据”“录屏验收”或类似能力时，默认实现必须是录制视频作为 `human-review-video` artifact，并明确说明视频不参与机器验收或 pass/fail 判定。即使视频 artifact 被错误标记为 evidence，也不应计入 `requiredEvidence` 覆盖。
 
 报告必须区分 `contract`、`behavior` 和 `browser` 验收类型。
 

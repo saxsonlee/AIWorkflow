@@ -135,7 +135,9 @@ def run(args):
     checks = _annotate_checks(_resolve_checks(_merge_checks(_mode_checks(modes, "checks"), acceptance.get("extraChecks", [])), context))
     post_checks = _annotate_checks(_resolve_checks(_merge_checks(_mode_checks(modes, "postChecks"), acceptance.get("extraPostChecks", [])), context))
     required_evidence = acceptance.get("requiredEvidence", ["contract"])
+    semantic_hints = acceptance.get("semanticHints", [])
     gate_findings = _audit_semantic_gates(checks + post_checks)
+    gate_findings.extend(_audit_semantic_hints(semantic_hints, required_evidence))
     gate_findings.extend(_audit_required_evidence(checks + post_checks, required_evidence))
 
     if args.dry_run:
@@ -145,6 +147,7 @@ def run(args):
             "iteration": iteration["version"],
             "modes": mode_ids,
             "requiredEvidence": required_evidence,
+            "semanticHints": semantic_hints,
             "templateSmoke": args.template_smoke,
             "modeSnapshots": modes,
             "checks": checks,
@@ -187,6 +190,7 @@ def run(args):
         mode_ids,
         modes,
         required_evidence,
+        semantic_hints,
         checks,
         post_checks,
         gate_findings,
@@ -216,6 +220,7 @@ def run(args):
             mode_ids,
             modes,
             required_evidence,
+            semantic_hints,
             checks,
             post_checks,
             gate_findings,
@@ -328,6 +333,8 @@ def _validate_acceptance(acceptance):
         raise ValueError("iteration acceptance.extraPostChecks must be a list.")
     if "requiredEvidence" in acceptance:
         _validate_required_evidence(acceptance["requiredEvidence"])
+    if "semanticHints" in acceptance:
+        _validate_semantic_hints(acceptance["semanticHints"])
 
 
 def _validate_required_evidence(required_evidence):
@@ -336,6 +343,14 @@ def _validate_required_evidence(required_evidence):
     for evidence_type in required_evidence:
         if evidence_type not in EVIDENCE_TYPES:
             raise ValueError(f"Unknown required evidence type: {evidence_type}")
+
+
+def _validate_semantic_hints(semantic_hints):
+    if not isinstance(semantic_hints, list):
+        raise ValueError("iteration acceptance.semanticHints must be a list.")
+    for hint in semantic_hints:
+        if hint not in EVIDENCE_TYPES:
+            raise ValueError(f"Unknown semantic hint: {hint}")
 
 
 def _run_check(check_call, errors):
@@ -384,6 +399,7 @@ def _build_result(
     mode_ids,
     mode_snapshots,
     required_evidence,
+    semantic_hints,
     checks,
     post_checks,
     semantic_gate_findings,
@@ -403,6 +419,7 @@ def _build_result(
         "modes": mode_ids,
         "modeSnapshots": mode_snapshots,
         "requiredEvidence": required_evidence,
+        "semanticHints": semantic_hints,
         "resolvedChecks": checks,
         "resolvedPostChecks": post_checks,
         "semanticGateFindings": semantic_gate_findings,
@@ -615,6 +632,28 @@ def _audit_required_evidence(checks, required_evidence):
     return findings
 
 
+def _audit_semantic_hints(semantic_hints, required_evidence):
+    findings = []
+    required = set(required_evidence)
+    for hint in semantic_hints:
+        if hint in required:
+            continue
+        findings.append(
+            {
+                "id": "aiworkflow.acceptance.semantic_hint_evidence",
+                "name": f"Missing requiredEvidence for semantic hint {hint}",
+                "severity": "required",
+                "acceptanceType": hint,
+                "status": "blocked",
+                "message": (
+                    f"Iteration declares semanticHints '{hint}', but acceptance.requiredEvidence "
+                    f"does not include '{hint}'."
+                ),
+            }
+        )
+    return findings
+
+
 def _has_evidence_type(checks, evidence_type):
     for check in checks:
         check_type = _check_acceptance_type(check)
@@ -633,7 +672,11 @@ def _check_has_driver_evidence(check):
         return True
     for artifact in check.get("artifacts", []):
         artifact_type = str(artifact.get("type", "")).lower()
-        if "driver" in artifact_type or "behavior" in artifact_type:
+        if "video" in artifact_type:
+            continue
+        if artifact.get("evidence") is True:
+            return True
+        if any(token in artifact_type for token in ["driver", "behavior", "browser-trace", "browser-dom", "browser-accessibility", "browser-json", "ui-metadata", "ui-log", "e2e-log"]):
             return True
     evidence = str(check.get("evidence", "")).lower()
     return evidence in {"behavior-driver", "browser-driver", "driver-artifact"}
@@ -782,6 +825,7 @@ def _write_blocked_without_acceptance(current, iteration):
         [],
         ["Current iteration has no acceptance."],
         now,
+        [],
         [],
         [],
         [],

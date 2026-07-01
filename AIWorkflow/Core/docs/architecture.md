@@ -65,7 +65,7 @@ Core/
       python/
     modes/
       temp/
-    tests/
+    tests/  # 源库自检，不属于分发后核心运行能力
 ```
 
 `Core/Acceptance` 保存 AIWorkflow 最小可运行能力。
@@ -73,6 +73,8 @@ Core/
 `Core/Acceptance/checks` 保存可迁移的通用 check。
 
 `Core/Acceptance/modes` 保存 Core 内置 mode。Core 内置 mode 不应依赖宿主项目、私有路径或本地环境。
+
+`Core/Acceptance/tests` 保存源库开发自检和发布门禁测试，不属于宿主项目接入 AIWorkflow 后的核心运行能力，也不应作为宿主项目同步验收依据。
 
 `Core/docs` 保存 Core 规范文档。入口页只做导航，具体规则由对应文档承载。
 

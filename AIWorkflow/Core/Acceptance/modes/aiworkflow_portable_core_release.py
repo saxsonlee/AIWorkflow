@@ -38,13 +38,22 @@ MODE = {
                     "Core/Acceptance/archive_manager.py",
                     "Core/Acceptance/modes/aiworkflow_minimal.py",
                     "Core/Acceptance/modes/aiworkflow_portable_core_release.py",
+                ]
+            },
+        },
+        {
+            "id": "python.py_compile_passed",
+            "name": "源库发布门禁测试语法编译通过",
+            "severity": "required",
+            "params": {
+                "paths": [
                     "Core/Acceptance/tests/test_split_layout.py",
                 ]
             },
         },
         {
             "id": "python.unittest_passed",
-            "name": "Core Acceptance unittest 通过",
+            "name": "源库自检 unittest 通过",
             "severity": "required",
             "params": {
                 "startDirectory": "Core/Acceptance/tests",
@@ -276,6 +285,33 @@ MODE = {
         },
         {
             "id": "common.content.contains",
+            "name": "Core docs 说明 semanticHints",
+            "severity": "required",
+            "params": {
+                "path": "Core/docs/check-driver-mode.md",
+                "text": "acceptance.semanticHints",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Core docs 说明视频默认辅助",
+            "severity": "required",
+            "params": {
+                "path": "Core/docs/check-driver-mode.md",
+                "text": "视频属于最低等级的 UI 辅助能力",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Core docs 说明 human-review-video",
+            "severity": "required",
+            "params": {
+                "path": "Core/docs/check-driver-mode.md",
+                "text": "human-review-video",
+            },
+        },
+        {
+            "id": "common.content.contains",
             "name": "Core docs 要求报告区分验收类型",
             "severity": "required",
             "params": {
@@ -290,6 +326,24 @@ MODE = {
             "params": {
                 "path": "Core/Acceptance/acceptance_runner.py",
                 "text": "aiworkflow.acceptance.required_evidence",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Runner 包含 semantic hints gate",
+            "severity": "required",
+            "params": {
+                "path": "Core/Acceptance/acceptance_runner.py",
+                "text": "aiworkflow.acceptance.semantic_hint_evidence",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Runner 不把 browser video 当机器证据",
+            "severity": "required",
+            "params": {
+                "path": "Core/Acceptance/acceptance_runner.py",
+                "text": "if \"video\" in artifact_type",
             },
         },
         {
@@ -317,6 +371,15 @@ MODE = {
             "params": {
                 "path": "Core/docs/data-model.md",
                 "text": "acceptance.requiredEvidence",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Core data-model 说明 semanticHints",
+            "severity": "required",
+            "params": {
+                "path": "Core/docs/data-model.md",
+                "text": "acceptance.semanticHints",
             },
         },
         {
@@ -452,6 +515,33 @@ MODE = {
             "params": {
                 "path": "Skill.Template/aiworkflow-trigger/SKILL.md",
                 "text": "acceptance.requiredEvidence",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Skill 约束 semantic hints",
+            "severity": "required",
+            "params": {
+                "path": "Skill.Template/aiworkflow-trigger/SKILL.md",
+                "text": "acceptance.semanticHints",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Skill 说明视频默认辅助",
+            "severity": "required",
+            "params": {
+                "path": "Skill.Template/aiworkflow-trigger/SKILL.md",
+                "text": "视频属于最低等级的 UI 辅助能力",
+            },
+        },
+        {
+            "id": "common.content.contains",
+            "name": "Skill 说明视频不参与 pass/fail",
+            "severity": "required",
+            "params": {
+                "path": "Skill.Template/aiworkflow-trigger/SKILL.md",
+                "text": "视频不参与机器验收或 pass/fail 判定",
             },
         },
         {
@@ -691,7 +781,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 README 导航职责",
+            "name": "源库发布门禁覆盖 README 导航职责",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -700,7 +790,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 docs 职责不混写",
+            "name": "源库发布门禁覆盖 docs 职责不混写",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -709,7 +799,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖指针闭环",
+            "name": "源库发布门禁覆盖指针闭环",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -718,7 +808,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 mode 不直接执行 driver",
+            "name": "源库发布门禁覆盖 mode 不直接执行 driver",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -727,7 +817,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖旧 mode 字段拒绝",
+            "name": "源库发布门禁覆盖旧 mode 字段拒绝",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -736,7 +826,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 mode 不互相引用",
+            "name": "源库发布门禁覆盖 mode 不互相引用",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -745,7 +835,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 Core docs 职责边界",
+            "name": "源库发布门禁覆盖 Core docs 职责边界",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -754,7 +844,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 Core 生产文件技术中立",
+            "name": "源库发布门禁覆盖 Core 生产文件技术中立",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -763,7 +853,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖开源源码 Workspace 模板",
+            "name": "源库发布门禁覆盖开源源码 Workspace 模板",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -772,7 +862,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "Standalone 模板测试存在",
+            "name": "源库发布门禁覆盖 Standalone 模板",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
@@ -781,7 +871,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试排除 README.old 打包",
+            "name": "源库发布门禁排除 README.old 打包",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",

@@ -14,7 +14,7 @@ MODE = {
         },
         {
             "id": "common.content.contains",
-            "name": "结构测试覆盖 modes 组合入口",
+            "name": "源库发布门禁测试覆盖 modes 组合入口",
             "severity": "required",
             "params": {
                 "path": "Core/Acceptance/tests/test_split_layout.py",
