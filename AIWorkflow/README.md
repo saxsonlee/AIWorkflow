@@ -122,6 +122,8 @@ python AIWorkflow\Core\Acceptance\acceptance_runner.py latest
 
 `run --template-smoke` 只证明安装可运行。真实任务验收前，应先创建或切换到正式 `Topic / Issue / Iteration`。
 
+`run --dry-run` 用于预览当前 Iteration 解析出的验收配置、证据要求和 checks，不生成 `Runs/` 目录，不更新 `LatestRun.md`，也不形成正式 pass/fail 记录。
+
 安装后如果 `Workspace/AITDDPolicy.json` 的 `defaultMode` 是 `enabled`，AI 应按项目策略主动进入 AITDD 流程；用户只需要在不希望使用 AITDD、只想讨论，或需要正式 `run` 时明确说明。
 
 ## 开始真实任务

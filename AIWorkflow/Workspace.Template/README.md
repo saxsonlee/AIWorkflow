@@ -19,6 +19,8 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --dry-run
 python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py run --template-smoke
 ```
 
+`run --dry-run` 用于预览当前 Iteration 解析出的验收配置、证据要求和 checks，不生成 `Runs/` 目录，不更新 `LatestRun.md`，也不形成正式 pass/fail 记录。
+
 ## 默认示例
 
 模板内置 `ExampleTopic / ExampleIssue / v0.1.0`，在 `acceptance.modes` 中使用 Core 内置的 `aiworkflow_minimal` mode。

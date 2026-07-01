@@ -64,6 +64,8 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --form
 
 `Workspace.Template/` 已内置 `ExampleTopic / ExampleIssue / v0.1.0` 示例，并在 `acceptance.modes` 中使用 `aiworkflow_minimal` mode，可作为新项目首次运行的最小验收链路。
 
+`run --dry-run` 用于预览当前 Iteration 解析出的 `modes`、证据要求、checks 和 postChecks。它不生成 `Runs/` 目录，不更新 `LatestRun.md`，不回写 Iteration 状态，也不形成正式 pass/fail 记录。
+
 由模板创建的 `Workspace/` 默认 `source` 是 `TEMPLATE`。
 
 普通 `run` 遇到模板工作区会返回 `blocked`。

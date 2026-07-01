@@ -42,7 +42,9 @@ python <AIWorkflow路径>\Core\Acceptance\acceptance_runner.py policy set --form
 
 ## Run 命令
 
-`run --dry-run` 只打印解析后的 checks 和 postChecks，不生成 Run 产物。
+`run --dry-run` 用于预览当前 Iteration 解析出的验收配置和检查清单，不执行正式验收落盘流程。输出包含 `modes`、`requiredEvidence`、`semanticHints`、`modeSnapshots`、`checks`、`postChecks` 和 `semanticGateFindings`。
+
+`run --dry-run` 不生成 `Runs/` 目录，不写入 `AcceptanceReport.md`、`Result.json` 或 `Run.log`，不更新 `Workspace/LatestRun.md`，不回写 Iteration 状态，也不形成正式 pass/fail 记录。
 
 `run` 生成正式验收记录，并写入当前 Issue 的 Run 目录。
 

@@ -84,6 +84,8 @@ python AIWorkflow\Core\Acceptance\acceptance_runner.py run --template-smoke
 python AIWorkflow\Core\Acceptance\acceptance_runner.py policy show
 ```
 
+`run --dry-run` 用于预览当前 Iteration 解析出的验收配置、证据要求和 checks，不生成 `Runs/` 目录，不更新 `LatestRun.md`，也不形成正式 pass/fail 记录。
+
 `run --template-smoke` 只用于确认模板安装可运行。真实任务验收前，应先创建或切换到正式 `Topic / Issue / Iteration`，不能直接把 `ExampleTopic / ExampleIssue` 的 Run 当作任务验收结果。
 
 ## AITDD 开关
